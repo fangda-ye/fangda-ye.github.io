@@ -13,6 +13,7 @@
 <style>
 :root {
   --bg: #fdfdfc;
+  --surface: #ffffff;
   --text: #1d1d1f;
   --muted: #5f6368;
   --faint: #8a8f96;
@@ -20,13 +21,16 @@
   --accent-soft: #e8f0fb;
   --line: #e7e7e3;
   --chip: #f1f2f4;
-  --hl: #f7f9fd;
+  --hl: #f5f8fd;
+  --nav-bg: rgba(253, 253, 252, 0.86);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 2px 8px rgba(0, 0, 0, .05);
   --todo-bg: #fff1f0;
   --todo: #c4261d;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #121314;
+    --surface: #1a1c1e;
     --text: #e8e8e6;
     --muted: #a3a8ae;
     --faint: #7d838a;
@@ -35,12 +39,15 @@
     --line: #2a2c2f;
     --chip: #1f2225;
     --hl: #171a1f;
+    --nav-bg: rgba(18, 19, 20, 0.86);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 2px 8px rgba(0, 0, 0, .3);
     --todo-bg: #3a1614;
     --todo: #ff8a80;
   }
 }
 :root[data-theme="dark"] {
   --bg: #121314;
+  --surface: #1a1c1e;
   --text: #e8e8e6;
   --muted: #a3a8ae;
   --faint: #7d838a;
@@ -49,12 +56,14 @@
   --line: #2a2c2f;
   --chip: #1f2225;
   --hl: #171a1f;
+  --nav-bg: rgba(18, 19, 20, 0.86);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 2px 8px rgba(0, 0, 0, .3);
   --todo-bg: #3a1614;
   --todo: #ff8a80;
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--bg);
@@ -63,257 +72,416 @@ body {
 }
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; text-underline-offset: 2px; }
-.wrap { max-width: 820px; margin: 0 auto; padding: 56px 24px 40px; }
+.icon { width: 16px; height: 16px; flex: none; }
+.icon.stroke { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.icon.fill { fill: currentColor; }
 
-/* Header */
-.hero { display: grid; grid-template-columns: 1fr 148px; gap: 32px; align-items: center; }
-.hero h1 {
-  margin: 0 0 4px;
-  font: 600 2.4rem/1.15 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  letter-spacing: -0.01em;
+/* Top navigation */
+.topnav {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--nav-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(10px); backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid var(--line);
 }
-.hero .role { margin: 0 0 14px; color: var(--muted); }
-.links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .95rem; }
-.links a { white-space: nowrap; }
+.topnav .inner {
+  max-width: 1120px; margin: 0 auto; padding: 0 32px; height: 56px;
+  display: flex; align-items: center; gap: 28px;
+}
+.brand { font: 600 1.05rem/1 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif; color: var(--text); white-space: nowrap; }
+.brand:hover { text-decoration: none; }
+.topnav nav { display: flex; gap: 22px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+.topnav nav::-webkit-scrollbar { display: none; }
+.topnav nav a { color: var(--muted); font-size: .93rem; white-space: nowrap; padding: 4px 0; border-bottom: 2px solid transparent; }
+.topnav nav a:hover { color: var(--text); text-decoration: none; }
+.topnav nav a.active { color: var(--text); border-bottom-color: var(--accent); }
+
+/* Two-column layout */
+.layout {
+  max-width: 1120px; margin: 0 auto; padding: 40px 32px 48px;
+  display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 56px;
+}
+.side-inner { position: sticky; top: 96px; }
 .photo {
-  width: 148px; height: 148px; border-radius: 50%;
-  object-fit: cover; display: block;
-  border: 1px solid var(--line);
+  width: 168px; height: 168px; border-radius: 50%; display: block;
+  object-fit: cover; border: 1px solid var(--line); box-shadow: var(--shadow);
 }
 .photo.placeholder {
   display: grid; place-items: center;
   background: var(--accent-soft); color: var(--accent);
-  font: 600 2.6rem/1 "Iowan Old Style", Georgia, serif;
+  font: 600 3rem/1 "Iowan Old Style", Georgia, serif;
 }
+.side h1 {
+  margin: 20px 0 4px;
+  font: 600 1.75rem/1.2 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  letter-spacing: -0.01em;
+}
+.side .role { margin: 0; color: var(--text); font-size: .95rem; }
+.side .aff { margin: 0 0 16px; color: var(--muted); font-size: .9rem; line-height: 1.45; }
+.contact { list-style: none; margin: 0; padding: 0; font-size: .92rem; }
+.contact li { display: flex; align-items: center; gap: 10px; padding: 4px 0; color: var(--muted); }
+.contact a { color: var(--text); }
+.contact a:hover { color: var(--accent); }
+.contact .icon { color: var(--faint); }
 
 /* Sections */
-section { margin-top: 44px; }
+section { scroll-margin-top: 76px; }
+section + section { margin-top: 48px; }
 h2 {
-  margin: 0 0 14px; padding-bottom: 6px;
-  font-size: 1.05rem; font-weight: 650; letter-spacing: .04em; text-transform: uppercase;
+  margin: 0 0 16px; padding-bottom: 8px;
+  font-size: 1.3rem; font-weight: 650; letter-spacing: -0.005em;
   border-bottom: 1px solid var(--line);
 }
-h3 { margin: 22px 0 8px; font-size: .82rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+h3 { margin: 26px 0 10px; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
 p { margin: 0 0 12px; }
-.callout {
-  margin-top: 16px; padding: 12px 16px; border-radius: 8px;
-  background: var(--accent-soft); border-left: 3px solid var(--accent);
-}
 
 /* News */
 .news { list-style: none; margin: 0; padding: 0; }
-.news li { display: grid; grid-template-columns: 88px 1fr; gap: 12px; padding: 5px 0; }
+.news li { display: grid; grid-template-columns: 84px 1fr; gap: 12px; padding: 5px 0; }
 .news time { color: var(--faint); font-variant-numeric: tabular-nums; font-size: .93rem; padding-top: 1px; }
 
 /* Publications */
-.note { font-size: .88rem; color: var(--faint); margin: -4px 0 6px; }
+.note { font-size: .88rem; color: var(--faint); margin: -4px 0 4px; }
 .pubs { list-style: none; margin: 0; padding: 0; }
-.pub { padding: 12px 14px; margin: 0 -14px 4px; border-radius: 8px; }
+.pub {
+  display: grid; grid-template-columns: 208px minmax(0, 1fr); gap: 22px; align-items: start;
+  padding: 14px; margin: 0 -14px 6px; border-radius: 10px; scroll-margin-top: 76px;
+}
 .pub.lead { background: var(--hl); }
+.thumb {
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 16 / 10; width: 100%; padding: 6px;
+  background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); overflow: hidden;
+}
+.thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.thumb.text {
+  padding: 14px; text-align: center; color: #fff;
+  background: linear-gradient(135deg, #1a5fb4 0%, #4a3fb0 55%, #7b4bb7 100%);
+  font: 600 1.05rem/1.3 "Iowan Old Style", Georgia, serif;
+}
 .pub .title { font-weight: 600; line-height: 1.4; }
 .pub .title a { color: var(--text); }
 .pub .title a:hover { color: var(--accent); }
-.pub .authors { font-size: .93rem; color: var(--muted); margin-top: 2px; }
+.pub .authors { font-size: .92rem; color: var(--muted); margin-top: 3px; }
 .pub .authors b { color: var(--text); font-weight: 650; }
-.pub .tldr { font-size: .93rem; margin-top: 4px; }
-.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 6px; font-size: .88rem; }
+.pub .tldr { font-size: .92rem; margin-top: 5px; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 8px; font-size: .88rem; }
 .venue {
-  display: inline-block; padding: 1px 8px; border-radius: 999px;
+  display: inline-block; padding: 1px 9px; border-radius: 999px;
   background: var(--chip); color: var(--text); font-weight: 600; font-size: .8rem; letter-spacing: .01em;
 }
 .venue.top { background: var(--accent-soft); color: var(--accent); }
-.role-tag { color: var(--faint); font-size: .82rem; }
 
 /* Experience / education */
-.entry { padding: 8px 0; }
+.entry { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 18px; padding: 12px 0; }
+.entry + .entry { border-top: 1px solid var(--line); }
+.logo {
+  width: 56px; height: 56px; padding: 7px; border-radius: 12px;
+  background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); object-fit: contain;
+}
 .entry-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; flex-wrap: wrap; }
 .entry-head .org { font-weight: 600; }
-.entry-head .when { color: var(--faint); font-size: .93rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.entry .sub { color: var(--muted); font-size: .95rem; }
-.entry .desc { font-size: .93rem; margin-top: 2px; }
+.entry-head .when { color: var(--faint); font-size: .92rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.entry .sub { color: var(--muted); font-size: .94rem; }
+.entry .desc { font-size: .93rem; margin-top: 3px; }
+
+/* Plain lists (honors, service) */
 .plain { list-style: none; margin: 0; padding: 0; }
-.plain li { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; flex-wrap: wrap; }
-.plain li .when { color: var(--faint); font-size: .93rem; white-space: nowrap; }
+.plain li { display: flex; justify-content: space-between; gap: 16px; padding: 5px 0; }
+.plain li + li { border-top: 1px dashed var(--line); }
+.plain li .when { color: var(--faint); font-size: .92rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 footer { margin-top: 56px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--faint); font-size: .85rem; }
 
 /* Placeholders (.todo): must all be gone before publishing */
 .todo { background: var(--todo-bg); color: var(--todo); border-radius: 3px; padding: 0 3px; font-weight: 500; }
 
-@media (max-width: 640px) {
-  .wrap { padding: 32px 16px 32px; }
-  .hero { grid-template-columns: 1fr; gap: 18px; }
-  .hero .photo { order: -1; width: 112px; height: 112px; }
-  .hero h1 { font-size: 2rem; }
+@media (max-width: 860px) {
+  .topnav .inner { padding: 0 16px; gap: 16px; }
+  .topnav nav { gap: 16px; }
+  .layout { grid-template-columns: 1fr; gap: 28px; padding: 24px 16px 32px; }
+  .side-inner {
+    position: static;
+    display: grid; grid-template-columns: 96px 1fr; gap: 6px 18px; align-items: center;
+  }
+  .photo { width: 96px; height: 96px; grid-row: span 3; }
+  .photo.placeholder { font-size: 1.9rem; }
+  .side h1 { margin: 0; font-size: 1.5rem; }
+  .side .aff { margin: 0; }
+  .contact { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 10px; }
+  .contact li { padding: 2px 0; }
+  .pub { grid-template-columns: 1fr; gap: 12px; margin: 0 -10px 6px; padding: 12px 10px; }
+  .thumb { max-width: 300px; }
+  .entry { grid-template-columns: 44px minmax(0, 1fr); gap: 14px; }
+  .logo { width: 44px; height: 44px; padding: 5px; border-radius: 10px; }
   .news li { grid-template-columns: 1fr; gap: 0; }
-  .pub { margin: 0 -10px 4px; padding: 10px; }
+  .plain li { flex-wrap: wrap; gap: 0 16px; }
+}
+@media (max-width: 380px) {
+  .brand { display: none; }
 }
 </style>
 </head>
 <body>
-<main class="wrap">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+  <symbol id="i-scholar" viewBox="0 0 24 24"><path d="M5.242 13.769L0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></symbol>
+  <symbol id="i-hf" viewBox="0 0 24 24"><path d="M1.4446 11.5059c0 1.1021.1673 2.1585.4847 3.1563-.0378-.0028-.0691-.0058-.1058-.0058-.4209 0-.8015.16-1.0704.4512-.3454.3737-.4984.8335-.4316 1.293a1.576 1.576 0 0 0 .2148.5978c-.2319.1864-.4018.4456-.4844.7578-.0646.2448-.131.7543.2149 1.2794a1.4552 1.4552 0 0 0-.0625.1055c-.208.3923-.2207.8372-.0371 1.25.2783.6258.9696 1.1175 2.3126 1.6467.8356.3292 1.5988.5411 1.6056.543 1.1046.2847 2.104.4277 2.969.4277 1.4173 0 2.4754-.3849 3.1525-1.1446 1.538.2651 2.791.1403 3.592.006.6773.7555 1.7332 1.1387 3.1467 1.1387.8649 0 1.8643-.143 2.969-.4278.0068-.0019.77-.2138 1.6056-.543 1.343-.5292 2.0343-1.0208 2.3126-1.6466.1836-.4129.171-.8577-.037-1.25a1.4685 1.4685 0 0 0-.0626-.1056c.346-.525.2795-1.0346.2149-1.2793-.0826-.3122-.2525-.5714-.4844-.7579.11-.1816.1831-.3788.2148-.5977.0669-.4595-.0862-.9193-.4316-1.293-.2688-.2913-.6495-.4513-1.0704-.4513-.0209 0-.0376.0008-.0588.0018.3162-.9966.4846-2.0518.4846-3.1523 0-5.807-4.7362-10.5144-10.5789-10.5144-5.8426 0-10.5788 4.7073-10.5788 10.5144Zm10.5788-9.4831c5.2727 0 9.5476 4.246 9.5476 9.483a9.4201 9.4201 0 0 1-.2696 2.2365c-.0039-.0047-.0079-.011-.0117-.0156-.274-.3255-.6679-.5059-1.1075-.5059-.352 0-.714.1155-1.0763.3438-.2403.1517-.5058.422-.7793.7598-.2534-.3492-.608-.5832-1.0137-.6465a1.5174 1.5174 0 0 0-.2344-.0176c-.9263 0-1.4828.7993-1.6935 1.5177-.1046.2426-.6065 1.3482-1.3614 2.0978-1.1681 1.1601-1.4458 2.3534-.8396 3.6382-.843.1029-1.5836.0927-2.365-.006.5906-1.212.3626-2.4388-.8426-3.6322-.755-.7496-1.2568-1.8552-1.3614-2.0978-.2107-.7184-.7673-1.5177-1.6935-1.5177-.078 0-.1568.0054-.2344.0176-.4057.0633-.7604.2973-1.0137.6465-.2735-.3379-.539-.6081-.7794-.7598-.3622-.2283-.7243-.3438-1.0762-.3438-.4266 0-.8094.171-1.0821.4786a9.4208 9.4208 0 0 1-.2598-2.1936c0-5.237 4.2749-9.483 9.5475-9.483zM8.6443 7.0036c-.4838.0043-.9503.2667-1.1934.7227-.3536.6633-.1006 1.4873.5645 1.84.351.1862.4883-.5261.836-.6485.3107-.1095.841.399 1.0078.086.3536-.6634.1025-1.4874-.5625-1.84a1.3659 1.3659 0 0 0-.6524-.1602Zm6.8403 0c-.2199-.002-.4426.05-.6504.1602-.665.3526-.9181 1.1766-.5645 1.84.1669.313.6971-.1955 1.0079-.086.3476.1224.4867.8347.838.6485.6649-.3527.916-1.1767.5624-1.84-.243-.456-.7096-.7184-1.1934-.7227Zm-9.7565 1.418a.8768.8768 0 0 0-.877.877c0 .4846.3925.877.877.877a.8768.8768 0 0 0 .877-.877.8768.8768 0 0 0-.877-.877zm12.6434 0c-.4845 0-.879.3925-.879.877 0 .4846.3945.877.879.877a.8768.8768 0 0 0 .877-.877.8768.8768 0 0 0-.877-.877zM8.7927 11.459c-.179-.003-.2793.1107-.2793.416 0 .8097.3874 2.125 1.4279 2.924.207-.7123 1.3453-1.2832 1.5079-1.2012.2315.1167.2191.4417.6074.7266.3884-.285.374-.6098.6056-.7266.1627-.082 1.3009.4889 1.5079 1.2012 1.0404-.799 1.4278-2.1144 1.4278-2.924 0-1.2212-1.583.6402-3.5413.6485-1.4686-.0061-2.7266-1.0558-3.2639-1.0645zM4.312 14.4768c.5792.365 1.6964 2.2751 2.1056 3.0177.1371.2488.371.3536.582.3536.4188 0 .7465-.4138.0391-.9395-1.0636-.791-.6914-2.0846-.1836-2.1642a.4302.4302 0 0 1 .0664-.004c.4616 0 .666.7892.666.7892s.5959 1.4898 1.6213 2.508c.942.9356 1.062 1.703.4961 2.6661-.0164-.004-.0159.0236-.1484.2149-.1853.2673-.4322.4688-.7188.6152-.5062.2269-1.1397.2696-1.7833.2696-1.037 0-2.1017-.1824-2.6975-.336-.0293-.0075-3.6505-.9567-3.1916-1.8224.0771-.1454.2033-.2031.3633-.2031.6463 0 1.823.9551 2.3283.9551.113 0 .196-.0865.2285-.2031.2249-.8045-3.2787-1.0522-2.9846-2.1642.0519-.1967.193-.2757.3907-.2754.854 0 2.7704 1.4923 3.172 1.4923.0307 0 .0525-.0085.0645-.0274.2012-.3227.1096-.5865-1.3087-1.4395-1.4182-.8533-2.4315-1.329-1.8653-1.9416.0651-.0707.1574-.1015.2695-.1015.8611.0002 2.8948 1.84 2.8948 1.84s.5487.5683.8809.5683c.0762 0 .1416-.0315.1855-.1054.2355-.3946-2.1858-2.2183-2.3224-2.971-.0926-.51.0641-.7676.3555-.7676-.0006.008.1701-.0285.4942.1759zm16.2257.5918c-.1366.7526-2.5579 2.5764-2.3224 2.9709.044.074.1092.1055.1855.1055.3321 0 .881-.5684.881-.5684s2.0336-1.8397 2.8947-1.84c.1121 0 .2044.0308.2695.1016.5662.6125-.447 1.0882-1.8653 1.9415-1.4183.853-1.51 1.1168-1.3087 1.4396.012.0188.0337.0273.0644.0273.4016 0 2.3181-1.4923 3.1721-1.4923.1977-.0002.3388.0787.3907.2754.294 1.112-3.2095 1.3597-2.9846 2.1642.0325.1166.1156.2032.2285.2032.5054 0 1.682-.9552 2.3283-.9552.16 0 .2862.0577.3633.2032.459.8656-3.1623 1.8149-3.1916 1.8224-.5958.1535-1.6605.336-2.6975.336-.6351 0-1.261-.0409-1.7638-.2599-.2949-.1472-.5488-.3516-.7383-.625-.0411-.0682-.1026-.1476-.1426-.205-.5726-.9679-.455-1.7371.4903-2.676 1.0254-1.0182 1.6212-2.508 1.6212-2.508s.2044-.7891.666-.7891a.4318.4318 0 0 1 .0665.0039c.5078.0796.88 1.3732-.1836 2.1642-.7074.5257-.3797.9395.039.9395.211 0 .445-.1047.5821-.3535.4092-.7426 1.5264-2.6527 2.1056-3.0178.5588-.3524.99-.1816.8497.5918z"/></symbol>
+</svg>
 
-  <header class="hero">
-    <div>
+<header class="topnav">
+  <div class="inner">
+    <a class="brand" href="#top">Fangda Ye</a>
+    <nav aria-label="Sections">
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+      <a href="#publications">Publications</a>
+      <a href="#experience">Experience</a>
+      <a href="#education">Education</a>
+      <a href="#honors">Honors</a>
+    </nav>
+  </div>
+</header>
+
+<div class="layout" id="top">
+  <aside class="side">
+    <div class="side-inner">
+      <!-- Replace with: <img class="photo" src="assets/photo.jpg" alt="Fangda Ye"> -->
+      <div class="photo placeholder" aria-hidden="true">FY</div>
       <h1>Fangda Ye</h1>
-      <p class="role">AI Engineer at TikTok &middot; M.Comp. (CS), National University of Singapore</p>
-      <nav class="links" aria-label="Profiles">
-        <a href="mailto:fangda.ye.cs@gmail.com">Email</a>
-        <a href="assets/fangda_ye_cv.pdf">CV</a>
-        <a href="https://scholar.google.com/citations?user=iJbnB_QAAAAJ">Google Scholar</a>
-        <a href="https://github.com/fangda-ye">GitHub</a>
-        <a href="https://huggingface.co/Fangda-Ye">Hugging Face</a>
-      </nav>
+      <p class="role">AI Engineer, TikTok</p>
+      <p class="aff">M.Comp. (CS), National University of Singapore</p>
+      <ul class="contact">
+        <li><svg class="icon stroke"><use href="#i-pin"/></svg>Singapore</li>
+        <li><svg class="icon stroke"><use href="#i-mail"/></svg><a href="mailto:fangda.ye.cs@gmail.com">Email</a></li>
+        <li><svg class="icon stroke"><use href="#i-file"/></svg><a href="assets/fangda_ye_cv.pdf">CV</a></li>
+        <li><svg class="icon fill"><use href="#i-scholar"/></svg><a href="https://scholar.google.com/citations?user=iJbnB_QAAAAJ">Google Scholar</a></li>
+        <li><svg class="icon fill"><use href="#i-github"/></svg><a href="https://github.com/fangda-ye">GitHub</a></li>
+        <li><svg class="icon fill"><use href="#i-hf"/></svg><a href="https://huggingface.co/Fangda-Ye">Hugging Face</a></li>
+      </ul>
     </div>
-    <!-- Replace with: <img class="photo" src="assets/photo.jpg" alt="Fangda Ye"> -->
-    <div class="photo placeholder" aria-hidden="true">FY</div>
-  </header>
+  </aside>
 
-  <section id="about">
-    <h2>About</h2>
-    <p>
-      I am an AI Engineer at TikTok in Singapore, working on the ranking model for e-commerce short videos in
-      TikTok's main feed: scaling it up, speeding up its training, and building agents that automate the
-      modeling workflow. I received my Master of Computing in Computer Science from the
-      <a href="https://www.comp.nus.edu.sg/">National University of Singapore</a> in 2026, and my
-      Bachelor of Engineering from Central South University.
-    </p>
-    <p>
-      My research so far is on <strong>deep research agents</strong>: agents that search across text and images
-      and write grounded long-form reports (<a href="#deep-reporter">Deep-Reporter</a>,
-      <a href="#doc-researcher">Doc-Researcher</a>), and ways to evaluate what these agents do along the way,
-      not just what they output (<a href="#miroeval">MiroEval</a>). I have also post-trained LLM agents with SFT
-      and RL, for parallel web search and for deciding when to step into a conversation, and worked on physically
-      consistent video generation and test-time training for robot manipulation. I have been fortunate to work with
-      <a href="https://www.comp.nus.edu.sg/cs/people/yansc">Prof. Shuicheng Yan</a>, Dr. Lidong Bing, and
-      Dr. Kuicai Dong.
-    </p>
-    <p>
-      I am broadly interested in how agents learn to reason and act:
-      <strong>reinforcement learning for LLM agents</strong>, <strong>test-time verification</strong>,
-      <strong>self-improving agents</strong>, and <strong>latent reasoning</strong>.
-    </p>
-  </section>
+  <main class="content">
+    <section id="about">
+      <h2>About</h2>
+      <p>
+        I am an AI Engineer at TikTok in Singapore, working on the ranking model for e-commerce short videos in
+        TikTok's main feed: scaling it up, speeding up its training, and building agents that automate the
+        modeling workflow. I received my Master of Computing in Computer Science from the
+        <a href="https://www.comp.nus.edu.sg/">National University of Singapore</a> in 2026, and my
+        Bachelor of Engineering from Central South University.
+      </p>
+      <p>
+        My research so far is on <strong>deep research agents</strong>: agents that search across text and images
+        and write grounded long-form reports (<a href="#deep-reporter">Deep-Reporter</a>,
+        <a href="#doc-researcher">Doc-Researcher</a>), and ways to evaluate what these agents do along the way,
+        not just what they output (<a href="#miroeval">MiroEval</a>). I have also post-trained LLM agents with SFT
+        and RL, for parallel web search and for deciding when to step into a conversation, and worked on physically
+        consistent video generation and test-time training for robot manipulation. I have been fortunate to work with
+        <a href="https://www.comp.nus.edu.sg/cs/people/yansc">Prof. Shuicheng Yan</a>, Dr. Lidong Bing, and
+        Dr. Kuicai Dong.
+      </p>
+      <p>
+        I am broadly interested in how agents learn to reason and act:
+        <strong>reinforcement learning for LLM agents</strong>, <strong>test-time verification</strong>,
+        <strong>self-improving agents</strong>, and <strong>latent reasoning</strong>.
+      </p>
+    </section>
 
-  <section id="news">
-    <h2>News</h2>
-    <ul class="news">
-      <li><time>Sep 2026</time><span><a href="#miroeval">MiroEval</a> and <a href="#seeing-the-unseen">Seeing the Unseen</a> were accepted to NeurIPS 2026.</span></li>
-      <li><time>Jun 2026</time><span>Joined TikTok as an AI Engineer.</span></li>
-      <li><time>Jun 2026</time><span>Graduated from NUS with the Academic Excellence Award.</span></li>
-      <li><time>Apr 2026</time><span><a href="#deep-reporter">Deep-Reporter</a> was accepted to the ACL 2026 main conference.</span></li>
-      <li><time>Jan 2026</time><span><a href="#doc-researcher">Doc-Researcher</a> was accepted to WWW 2026.</span></li>
-    </ul>
-  </section>
+    <section id="news">
+      <h2>News</h2>
+      <ul class="news">
+        <li><time>Sep 2026</time><span><a href="#miroeval">MiroEval</a> and <a href="#seeing-the-unseen">Seeing the Unseen</a> were accepted to NeurIPS 2026.</span></li>
+        <li><time>Jun 2026</time><span>Joined TikTok as an AI Engineer.</span></li>
+        <li><time>Jun 2026</time><span>Graduated from NUS with the Academic Excellence Award.</span></li>
+        <li><time>Apr 2026</time><span><a href="#deep-reporter">Deep-Reporter</a> was accepted to the ACL 2026 main conference.</span></li>
+        <li><time>Jan 2026</time><span><a href="#doc-researcher">Doc-Researcher</a> was accepted to WWW 2026.</span></li>
+      </ul>
+    </section>
 
-  <section id="publications">
-    <h2>Publications</h2>
-    <p class="note">* equal contribution. Highlighted: first or co-first author.</p>
+    <section id="publications">
+      <h2>Publications</h2>
+      <p class="note">* equal contribution. Highlighted: first or co-first author.</p>
 
-    <h3>Conference papers</h3>
-    <ul class="pubs">
-      <li class="pub lead" id="miroeval">
-        <div class="title"><a href="https://arxiv.org/abs/2603.28407">MiroEval: Benchmarking Multimodal Deep Research Agents in Process and Outcome</a></div>
-        <div class="authors"><b>Fangda Ye</b>, Yuxin Hu, Pengxiang Zhu, Yibo Li, Ziqi Jin, &hellip;, Bryan Hooi, Bo An, Shuicheng Yan, Lidong Bing</div>
-        <div class="tldr">A benchmark of 100 real-world tasks (70 text, 30 multimodal) that scores deep research agents on synthesis quality, factual verification, and the research process itself. Process quality turns out to predict the final outcome.</div>
-        <div class="meta"><span class="venue top">NeurIPS 2026</span><a href="https://arxiv.org/abs/2603.28407">arXiv</a><a href="https://github.com/MiroMindAI/MiroEval">Code</a></div>
-      </li>
+      <h3>Conference papers</h3>
+      <ul class="pubs">
+        <li class="pub lead" id="miroeval">
+          <a class="thumb" href="https://arxiv.org/abs/2603.28407"><img src="assets/papers/miroeval.jpg" alt="MiroEval evaluation pipeline: synthesis quality, agentic factuality and process-centric evaluation" loading="lazy"></a>
+          <div>
+            <div class="title"><a href="https://arxiv.org/abs/2603.28407">MiroEval: Benchmarking Multimodal Deep Research Agents in Process and Outcome</a></div>
+            <div class="authors"><b>Fangda Ye</b>*, Yuxin Hu*, Pengxiang Zhu*, Yibo Li*, Ziqi Jin, &hellip;, Bryan Hooi, Bo An, Shuicheng Yan, Lidong Bing</div>
+            <div class="tldr">A benchmark of 100 real-world tasks (70 text, 30 multimodal) that scores deep research agents on synthesis quality, factual verification, and the research process itself. Process quality turns out to predict the final outcome.</div>
+            <div class="meta"><span class="venue top">NeurIPS 2026</span><a href="https://arxiv.org/abs/2603.28407">arXiv</a><a href="https://github.com/MiroMindAI/MiroEval">Code</a></div>
+          </div>
+        </li>
 
-      <li class="pub lead" id="deep-reporter">
-        <div class="title"><a href="https://aclanthology.org/2026.acl-long.1909/">Deep-Reporter: Deep Research for Grounded Multimodal Long-Form Generation</a></div>
-        <div class="authors"><b>Fangda Ye</b>, Kuicai Dong, Zhifei Xie, Yuxin Hu, Yihang Yin, Shurui Huang, Shikai Dong, Chen Zhang, Jianzhu Bao, Shuicheng Yan</div>
-        <div class="tldr">An agent that writes long reports with images, grounded in what it retrieves: multimodal search and filtering, checklist-guided synthesis, and recurrent context management. Comes with M2LongBench, 247 research tasks across 9 domains.</div>
-        <div class="meta"><span class="venue top">ACL 2026 Main</span><a href="https://aclanthology.org/2026.acl-long.1909/">Paper</a><a href="https://arxiv.org/abs/2604.10741">arXiv</a><a href="https://github.com/fangda-ye/Deep-Report">Code</a><a href="https://huggingface.co/datasets/Fangda-Ye/Deep-Reporter-Data">Data</a></div>
-      </li>
+        <li class="pub lead" id="deep-reporter">
+          <a class="thumb" href="https://aclanthology.org/2026.acl-long.1909/"><img src="assets/papers/deep-reporter.jpg" alt="Deep-Reporter compared with text-only and text-to-image report generation" loading="lazy"></a>
+          <div>
+            <div class="title"><a href="https://aclanthology.org/2026.acl-long.1909/">Deep-Reporter: Deep Research for Grounded Multimodal Long-Form Generation</a></div>
+            <div class="authors"><b>Fangda Ye</b>*, Kuicai Dong*, Zhifei Xie*, Yuxin Hu*, Yihang Yin, Shurui Huang, Shikai Dong, Chen Zhang, Jianzhu Bao, Shuicheng Yan</div>
+            <div class="tldr">An agent that writes long reports with images, grounded in what it retrieves: multimodal search and filtering, checklist-guided synthesis, and recurrent context management. Comes with M2LongBench, 247 research tasks across 9 domains.</div>
+            <div class="meta"><span class="venue top">ACL 2026 Main</span><a href="https://aclanthology.org/2026.acl-long.1909/">Paper</a><a href="https://arxiv.org/abs/2604.10741">arXiv</a><a href="https://github.com/fangda-ye/Deep-Report">Code</a><a href="https://huggingface.co/datasets/Fangda-Ye/Deep-Reporter-Data">Data</a></div>
+          </div>
+        </li>
 
-      <li class="pub" id="seeing-the-unseen">
-        <div class="title">Seeing the Unseen: Unified Visible&ndash;Invisible Motion for Physically Consistent Video Generation</div>
-        <div class="authors">Mingyang Bao, <b>Fangda Ye</b>, Xihao Chen, Bobo Li, Xiangtai Li, Shengqiong Wu</div>
-        <div class="tldr">Video generation that models visible and invisible motion together, so that generated videos stay physically consistent.</div>
-        <div class="meta"><span class="venue top">NeurIPS 2026</span></div>
-      </li>
+        <li class="pub" id="seeing-the-unseen">
+          <div class="thumb"><img src="assets/papers/seeing-the-unseen.jpg" alt="A ball rolling into a candle: input frames, visible motion, and predicted future motion" loading="lazy"></div>
+          <div>
+            <div class="title">Seeing the Unseen: Unified Visible&ndash;Invisible Motion for Physically Consistent Video Generation</div>
+            <div class="authors">Mingyang Bao, <b>Fangda Ye</b>, Xihao Chen, Bobo Li, Xiangtai Li, Shengqiong Wu</div>
+            <div class="tldr">Video generation that models visible and invisible motion together, so that generated videos stay physically consistent.</div>
+            <div class="meta"><span class="venue top">NeurIPS 2026</span></div>
+          </div>
+        </li>
 
-      <li class="pub lead" id="doc-researcher">
-        <div class="title"><a href="https://arxiv.org/abs/2510.21603">Doc-Researcher: A Unified System for Multimodal Document Parsing and Deep Research</a></div>
-        <div class="authors">Kuicai Dong*, Shurui Huang*, <b>Fangda Ye</b>*, Wei Han, Zhi Zhang, Dexun Li, Wenjun Li, Qu Yang, Gang Wang, Yichao Wang, Chen Zhang, Yong Liu</div>
-        <div class="tldr">Deep research over long multimodal documents through document parsing, adaptive retrieval, and an iterative multi-agent workflow. On the new M4DocBench it reaches 50.6% accuracy, 3.4&times; the strongest baseline.</div>
-        <div class="meta"><span class="venue top">WWW 2026</span><a href="https://arxiv.org/abs/2510.21603">arXiv</a></div>
-      </li>
-    </ul>
+        <li class="pub lead" id="doc-researcher">
+          <a class="thumb" href="https://arxiv.org/abs/2510.21603"><img src="assets/papers/doc-researcher.jpg" alt="Doc-Researcher agent workflow: planner, searcher, refiner and reporter" loading="lazy"></a>
+          <div>
+            <div class="title"><a href="https://arxiv.org/abs/2510.21603">Doc-Researcher: A Unified System for Multimodal Document Parsing and Deep Research</a></div>
+            <div class="authors">Kuicai Dong*, Shurui Huang*, <b>Fangda Ye</b>*, Wei Han, Zhi Zhang, Dexun Li, Wenjun Li, Qu Yang, Gang Wang, Yichao Wang, Chen Zhang, Yong Liu</div>
+            <div class="tldr">Deep research over long multimodal documents through document parsing, adaptive retrieval, and an iterative multi-agent workflow. On the new M4DocBench it reaches 50.6% accuracy, 3.4&times; the strongest baseline.</div>
+            <div class="meta"><span class="venue top">WWW 2026</span><a href="https://arxiv.org/abs/2510.21603">arXiv</a></div>
+          </div>
+        </li>
+      </ul>
 
-    <h3>Under review</h3>
-    <ul class="pubs">
-      <li class="pub lead" id="tc-ttt">
-        <div class="title">Temporal Contrastive Test-Time Training for Robotic Manipulation</div>
-        <div class="authors">Yihang Yin*, <b>Fangda Ye</b>*, Shiguang Wu, Kunhao Pan, Ruiyang Xu, Ruyi Gan, Hao Wang</div>
-        <div class="tldr">A contrastive inner objective for test-time training that lets a robot policy's memory compare the present with its own history. Raises mean success on nine RMBench tasks from 31.8% to 51.8% over reconstruction-based TTT.</div>
-        <div class="meta"><span class="venue">Under review</span></div>
-      </li>
-    </ul>
+      <h3>Under review</h3>
+      <ul class="pubs">
+        <li class="pub lead" id="tc-ttt">
+          <div class="thumb"><img src="assets/papers/tc-ttt.jpg" alt="Reconstruction-based test-time training compared with temporal contrastive test-time training" loading="lazy"></div>
+          <div>
+            <div class="title">Temporal Contrastive Test-Time Training for Robotic Manipulation</div>
+            <div class="authors">Yihang Yin*, <b>Fangda Ye</b>*, Shiguang Wu, Kunhao Pan, Ruiyang Xu, Ruyi Gan, Hao Wang</div>
+            <div class="tldr">A contrastive inner objective for test-time training that lets a robot policy's memory compare the present with its own history. Raises mean success on nine RMBench tasks from 31.8% to 51.8% over reconstruction-based TTT.</div>
+            <div class="meta"><span class="venue">Under review</span></div>
+          </div>
+        </li>
+      </ul>
 
-    <h3>Technical reports</h3>
-    <ul class="pubs">
-      <li class="pub" id="mirothinker">
-        <div class="title"><a href="https://arxiv.org/abs/2603.15726">MiroThinker-1.7 &amp; H1: Towards Heavy-Duty Research Agents via Verification</a></div>
-        <div class="authors">MiroMind Team (contributor; <b>Fangda Ye</b> among 41 authors)</div>
-        <div class="meta"><span class="venue">Tech report 2026</span><a href="https://arxiv.org/abs/2603.15726">arXiv</a></div>
-      </li>
-      <li class="pub" id="pask">
-        <div class="title"><a href="https://arxiv.org/abs/2604.08000">PASK: Toward Intent-Aware Proactive Agents with Long-Term Memory</a></div>
-        <div class="authors">Zhifei Xie, Zongzheng Hu, <b>Fangda Ye</b>, Xin Zhang, Haobo Chai, &hellip;, Deheng Ye, Chunyan Miao, Shuicheng Yan</div>
-        <div class="meta"><span class="venue">Tech report 2026</span><a href="https://arxiv.org/abs/2604.08000">arXiv</a></div>
-      </li>
-    </ul>
-  </section>
+      <h3>Technical reports</h3>
+      <ul class="pubs">
+        <li class="pub" id="mirothinker">
+          <a class="thumb" href="https://arxiv.org/abs/2603.15726"><img src="assets/papers/mirothinker.jpg" alt="MiroThinker benchmark results" loading="lazy"></a>
+          <div>
+            <div class="title"><a href="https://arxiv.org/abs/2603.15726">MiroThinker-1.7 &amp; H1: Towards Heavy-Duty Research Agents via Verification</a></div>
+            <div class="authors">MiroMind Team (contributor; <b>Fangda Ye</b> among 41 authors)</div>
+            <div class="meta"><span class="venue">Tech report 2026</span><a href="https://arxiv.org/abs/2603.15726">arXiv</a></div>
+          </div>
+        </li>
+        <li class="pub" id="pask">
+          <a class="thumb" href="https://arxiv.org/abs/2604.08000"><img src="assets/papers/pask.png" alt="PASK system with the IntentFlow demand detector and memory" loading="lazy"></a>
+          <div>
+            <div class="title"><a href="https://arxiv.org/abs/2604.08000">PASK: Toward Intent-Aware Proactive Agents with Long-Term Memory</a></div>
+            <div class="authors">Zhifei Xie, Zongzheng Hu, <b>Fangda Ye</b>, Xin Zhang, Haobo Chai, &hellip;, Deheng Ye, Chunyan Miao, Shuicheng Yan</div>
+            <div class="meta"><span class="venue">Tech report 2026</span><a href="https://arxiv.org/abs/2604.08000">arXiv</a></div>
+          </div>
+        </li>
+      </ul>
+    </section>
 
-  <section id="experience">
-    <h2>Experience</h2>
-    <div class="entry">
-      <div class="entry-head"><span class="org">TikTok, Singapore</span><span class="when">Jun 2026 &ndash; present</span></div>
-      <div class="sub">AI Engineer, e-commerce recommendation</div>
-      <div class="desc">Ranking models for e-commerce short videos in TikTok's main feed. Upgraded training to user-level training (more than 2&times; faster). Now scaling up the ranking model with Transformer-based feature fusion, and building agents that automate the modeling loop, from adding features to running experiments and attributing results.</div>
-    </div>
-    <div class="entry">
-      <div class="entry-head"><span class="org">MiroMind (now Apodex), Singapore</span><span class="when">Dec 2025 &ndash; Jun 2026</span></div>
-      <div class="sub">AI Scientist Intern &middot; Lead: Lidong Bing &middot; Mentors: Yue Deng, Lei Wang, Bin Wang</div>
-      <div class="desc">Led <a href="#miroeval">MiroEval</a>, which also served as the internal evaluation for <a href="#mirothinker">MiroThinker-1.7 &amp; H1</a>. Post-trained Qwen3.5-35B-A3B for parallel wide search (+35% relative on WideSearch-Bench), and designed memory, context, and retry handling in the MiroFlow v1.7 agent framework.</div>
-    </div>
-    <div class="entry">
-      <div class="entry-head"><span class="org">Learning and Vision Lab, NUS</span><span class="when">Aug 2025 &ndash; May 2026</span></div>
-      <div class="sub">Graduate Researcher, with Prof. Shuicheng Yan</div>
-      <div class="desc">Master's thesis within <a href="#pask">PASK</a> on proactive demand detection: when should an assistant step into a conversation unasked? Built the LatentNeeds-Bench benchmark and InnerMind, a detector trained with SFT and GRPO that reaches 84.2% balanced accuracy.</div>
-    </div>
-    <div class="entry">
-      <div class="entry-head"><span class="org">Huawei Singapore Research Center (Noah's Ark Lab)</span><span class="when">May 2025 &ndash; Dec 2025</span></div>
-      <div class="sub">AI Researcher Intern, with Dr. Kuicai Dong</div>
-      <div class="desc">Built <a href="#deep-reporter">Deep-Reporter</a> end to end, including the M2LongBench benchmark and 8K agentic traces for SFT. Designed the agent workflow of <a href="#doc-researcher">Doc-Researcher</a>. Outstanding Intern award.</div>
-    </div>
-  </section>
+    <section id="experience">
+      <h2>Experience</h2>
+      <div class="entry">
+        <img class="logo" src="assets/logos/tiktok.png" alt="TikTok">
+        <div>
+          <div class="entry-head"><span class="org">TikTok, Singapore</span><span class="when">Jun 2026 &ndash; present</span></div>
+          <div class="sub">AI Engineer, e-commerce recommendation</div>
+          <div class="desc">Ranking models for e-commerce short videos in TikTok's main feed. Upgraded training to user-level training (more than 2&times; faster). Now scaling up the ranking model with Transformer-based feature fusion, and building agents that automate the modeling loop, from adding features to running experiments and attributing results.</div>
+        </div>
+      </div>
+      <div class="entry">
+        <img class="logo" src="assets/logos/miromind.png" alt="MiroMind">
+        <div>
+          <div class="entry-head"><span class="org">MiroMind (now Apodex), Singapore</span><span class="when">Dec 2025 &ndash; Jun 2026</span></div>
+          <div class="sub">AI Scientist Intern &middot; Lead: Lidong Bing &middot; Mentors: Yue Deng, Lei Wang, Bin Wang</div>
+          <div class="desc">Co-first author of <a href="#miroeval">MiroEval</a>, which also served as the internal evaluation for <a href="#mirothinker">MiroThinker-1.7 &amp; H1</a>. Post-trained Qwen3.5-35B-A3B for parallel wide search (+35% relative on WideSearch-Bench), and designed memory, context, and retry handling in the MiroFlow v1.7 agent framework.</div>
+        </div>
+      </div>
+      <div class="entry">
+        <img class="logo" src="assets/logos/nus.png" alt="National University of Singapore">
+        <div>
+          <div class="entry-head"><span class="org">Learning and Vision Lab, NUS</span><span class="when">Aug 2025 &ndash; May 2026</span></div>
+          <div class="sub">Graduate Researcher, with Prof. Shuicheng Yan</div>
+          <div class="desc">Master's thesis within <a href="#pask">PASK</a> on proactive demand detection: when should an assistant step into a conversation unasked? Built the LatentNeeds-Bench benchmark and InnerMind, a detector trained with SFT and GRPO that reaches 84.2% balanced accuracy.</div>
+        </div>
+      </div>
+      <div class="entry">
+        <img class="logo" src="assets/logos/noah.png" alt="Huawei Noah's Ark Lab">
+        <div>
+          <div class="entry-head"><span class="org">Huawei Singapore Research Center (Noah's Ark Lab)</span><span class="when">May 2025 &ndash; Dec 2025</span></div>
+          <div class="sub">AI Researcher Intern, with Dr. Kuicai Dong</div>
+          <div class="desc">Built <a href="#deep-reporter">Deep-Reporter</a> end to end, including the M2LongBench benchmark and 8K agentic traces for SFT. Designed the agent workflow of <a href="#doc-researcher">Doc-Researcher</a>.</div>
+        </div>
+      </div>
+    </section>
 
-  <section id="education">
-    <h2>Education</h2>
-    <div class="entry">
-      <div class="entry-head"><span class="org">National University of Singapore</span><span class="when">Aug 2024 &ndash; Jun 2026</span></div>
-      <div class="sub">Master of Computing (Computer Science) &middot; GPA 4.88 / 5.00</div>
-      <div class="desc">Academic Excellence Award (AY2025/26); Dean's List, both semesters of AY2024/25.<br>
-        Thesis: <em>Proactive Demand Detection in Multi-Turn Conversations: Benchmark, Method, and Evaluation</em>.</div>
-    </div>
-    <div class="entry">
-      <div class="entry-head"><span class="org">Central South University</span><span class="when">Sep 2019 &ndash; Jun 2023</span></div>
-      <div class="sub">Bachelor of Engineering &middot; GPA 90.78 / 100</div>
-      <div class="desc">Outstanding Graduate; Outstanding Undergraduate Thesis.</div>
-    </div>
-  </section>
+    <section id="education">
+      <h2>Education</h2>
+      <div class="entry">
+        <img class="logo" src="assets/logos/nus.png" alt="National University of Singapore">
+        <div>
+          <div class="entry-head"><span class="org">National University of Singapore</span><span class="when">Aug 2024 &ndash; Jun 2026</span></div>
+          <div class="sub">Master of Computing (Computer Science) &middot; GPA 4.88 / 5.00</div>
+          <div class="desc">Thesis: <em>Proactive Demand Detection in Multi-Turn Conversations: Benchmark, Method, and Evaluation</em>.</div>
+        </div>
+      </div>
+      <div class="entry">
+        <img class="logo" src="assets/logos/csu.png" alt="Central South University">
+        <div>
+          <div class="entry-head"><span class="org">Central South University</span><span class="when">Sep 2019 &ndash; Jun 2023</span></div>
+          <div class="sub">Bachelor of Engineering &middot; GPA 90.78 / 100</div>
+        </div>
+      </div>
+    </section>
 
-  <section id="service">
-    <h2>Service</h2>
-    <ul class="plain">
-      <li><span>Reviewer, Workshop on Long-Context Foundation Models (LCFM), NeurIPS 2026</span><span class="when">2026</span></li>
-      <li><span>Reviewer, <em>ENGINEERING Information Technology &amp; Electronic Engineering</em></span><span class="when">2026</span></li>
-    </ul>
-  </section>
+    <section id="honors">
+      <h2>Honors and Awards</h2>
+      <ul class="plain">
+        <li><span>Academic Excellence Award, School of Computing, NUS</span><span class="when">2026</span></li>
+        <li><span>Dean's List, School of Computing, NUS (both semesters of AY2024/25)</span><span class="when">2025</span></li>
+        <li><span>Outstanding Intern, Huawei Singapore Research Center</span><span class="when">2025</span></li>
+        <li><span>National Second Prize, China Postgraduate Mathematical Contest in Modeling</span><span class="when">2023</span></li>
+        <li><span>Outstanding Graduate, Central South University</span><span class="when">2023</span></li>
+        <li><span>Outstanding Undergraduate Thesis, Central South University</span><span class="when">2023</span></li>
+      </ul>
+    </section>
 
-  <footer>Last updated October 2026.</footer>
-</main>
+    <section id="service">
+      <h2>Service</h2>
+      <ul class="plain">
+        <li><span>Reviewer, Workshop on Long-Context Foundation Models (LCFM), NeurIPS 2026</span><span class="when">2026</span></li>
+        <li><span>Reviewer, <em>ENGINEERING Information Technology &amp; Electronic Engineering</em></span><span class="when">2026</span></li>
+      </ul>
+    </section>
+
+    <footer>Last updated October 2026.</footer>
+  </main>
+</div>
+
+<script>
+// Highlight the nav link of the section in view.
+(function () {
+  var links = document.querySelectorAll('.topnav nav a');
+  if (!('IntersectionObserver' in window) || !links.length) return;
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove('active'); });
+      var a = byId[e.target.id];
+      if (a) a.classList.add('active');
+    });
+  }, { rootMargin: '-80px 0px -70% 0px' });
+  Object.keys(byId).forEach(function (id) {
+    var s = document.getElementById(id);
+    if (s) obs.observe(s);
+  });
+})();
+</script>
 </body>
 </html>
