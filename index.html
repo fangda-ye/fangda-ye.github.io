@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fangda Ye</title>
+<meta name="description" content="Fangda Ye — deep research agents, agent evaluation, and post-training of LLM agents.">
+<meta name="author" content="Fangda Ye">
+<meta property="og:title" content="Fangda Ye">
+<meta property="og:description" content="Deep research agents, agent evaluation, and post-training of LLM agents.">
+<meta property="og:type" content="profile">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231a5fb4'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'%3EFY%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #fdfdfc;
+  --text: #1d1d1f;
+  --muted: #5f6368;
+  --faint: #8a8f96;
+  --accent: #1a5fb4;
+  --accent-soft: #e8f0fb;
+  --line: #e7e7e3;
+  --chip: #f1f2f4;
+  --hl: #f7f9fd;
+  --todo-bg: #fff1f0;
+  --todo: #c4261d;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121314;
+    --text: #e8e8e6;
+    --muted: #a3a8ae;
+    --faint: #7d838a;
+    --accent: #84b4ff;
+    --accent-soft: #1b2638;
+    --line: #2a2c2f;
+    --chip: #1f2225;
+    --hl: #171a1f;
+    --todo-bg: #3a1614;
+    --todo: #ff8a80;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121314;
+  --text: #e8e8e6;
+  --muted: #a3a8ae;
+  --faint: #7d838a;
+  --accent: #84b4ff;
+  --accent-soft: #1b2638;
+  --line: #2a2c2f;
+  --chip: #1f2225;
+  --hl: #171a1f;
+  --todo-bg: #3a1614;
+  --todo: #ff8a80;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+.wrap { max-width: 820px; margin: 0 auto; padding: 56px 24px 40px; }
+
+/* Header */
+.hero { display: grid; grid-template-columns: 1fr 148px; gap: 32px; align-items: center; }
+.hero h1 {
+  margin: 0 0 4px;
+  font: 600 2.4rem/1.15 "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  letter-spacing: -0.01em;
+}
+.hero .role { margin: 0 0 14px; color: var(--muted); }
+.links { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: .95rem; }
+.links a { white-space: nowrap; }
+.photo {
+  width: 148px; height: 148px; border-radius: 50%;
+  object-fit: cover; display: block;
+  border: 1px solid var(--line);
+}
+.photo.placeholder {
+  display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent);
+  font: 600 2.6rem/1 "Iowan Old Style", Georgia, serif;
+}
+
+/* Sections */
+section { margin-top: 44px; }
+h2 {
+  margin: 0 0 14px; padding-bottom: 6px;
+  font-size: 1.05rem; font-weight: 650; letter-spacing: .04em; text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+}
+h3 { margin: 22px 0 8px; font-size: .82rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); }
+p { margin: 0 0 12px; }
+.callout {
+  margin-top: 16px; padding: 12px 16px; border-radius: 8px;
+  background: var(--accent-soft); border-left: 3px solid var(--accent);
+}
+
+/* News */
+.news { list-style: none; margin: 0; padding: 0; }
+.news li { display: grid; grid-template-columns: 88px 1fr; gap: 12px; padding: 5px 0; }
+.news time { color: var(--faint); font-variant-numeric: tabular-nums; font-size: .93rem; padding-top: 1px; }
+
+/* Publications */
+.note { font-size: .88rem; color: var(--faint); margin: -4px 0 6px; }
+.pubs { list-style: none; margin: 0; padding: 0; }
+.pub { padding: 12px 14px; margin: 0 -14px 4px; border-radius: 8px; }
+.pub.lead { background: var(--hl); }
+.pub .title { font-weight: 600; line-height: 1.4; }
+.pub .title a { color: var(--text); }
+.pub .title a:hover { color: var(--accent); }
+.pub .authors { font-size: .93rem; color: var(--muted); margin-top: 2px; }
+.pub .authors b { color: var(--text); font-weight: 650; }
+.pub .tldr { font-size: .93rem; margin-top: 4px; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 6px; font-size: .88rem; }
+.venue {
+  display: inline-block; padding: 1px 8px; border-radius: 999px;
+  background: var(--chip); color: var(--text); font-weight: 600; font-size: .8rem; letter-spacing: .01em;
+}
+.venue.top { background: var(--accent-soft); color: var(--accent); }
+.role-tag { color: var(--faint); font-size: .82rem; }
+
+/* Experience / education */
+.entry { padding: 8px 0; }
+.entry-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+.entry-head .org { font-weight: 600; }
+.entry-head .when { color: var(--faint); font-size: .93rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.entry .sub { color: var(--muted); font-size: .95rem; }
+.entry .desc { font-size: .93rem; margin-top: 2px; }
+.plain { list-style: none; margin: 0; padding: 0; }
+.plain li { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0; flex-wrap: wrap; }
+.plain li .when { color: var(--faint); font-size: .93rem; white-space: nowrap; }
+
+footer { margin-top: 56px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--faint); font-size: .85rem; }
+
+/* Placeholders (.todo): must all be gone before publishing */
+.todo { background: var(--todo-bg); color: var(--todo); border-radius: 3px; padding: 0 3px; font-weight: 500; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 32px 16px 32px; }
+  .hero { grid-template-columns: 1fr; gap: 18px; }
+  .hero .photo { order: -1; width: 112px; height: 112px; }
+  .hero h1 { font-size: 2rem; }
+  .news li { grid-template-columns: 1fr; gap: 0; }
+  .pub { margin: 0 -10px 4px; padding: 10px; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="hero">
+    <div>
+      <h1>Fangda Ye</h1>
+      <p class="role">AI Engineer at TikTok &middot; M.Comp. (CS), National University of Singapore</p>
+      <nav class="links" aria-label="Profiles">
+        <a href="mailto:fangda.ye.cs@gmail.com">Email</a>
+        <a href="assets/fangda_ye_cv.pdf">CV</a>
+        <a href="https://scholar.google.com/citations?user=iJbnB_QAAAAJ">Google Scholar</a>
+        <a href="https://github.com/fangda-ye">GitHub</a>
+        <a href="https://huggingface.co/Fangda-Ye">Hugging Face</a>
+      </nav>
+    </div>
+    <!-- Replace with: <img class="photo" src="assets/photo.jpg" alt="Fangda Ye"> -->
+    <div class="photo placeholder" aria-hidden="true">FY</div>
+  </header>
+
+  <section id="about">
+    <h2>About</h2>
+    <p>
+      I am an AI Engineer at TikTok in Singapore, working on the ranking model for e-commerce short videos in
+      TikTok's main feed: scaling it up, speeding up its training, and building agents that automate the
+      modeling workflow. I received my Master of Computing in Computer Science from the
+      <a href="https://www.comp.nus.edu.sg/">National University of Singapore</a> in 2026, and my
+      Bachelor of Engineering from Central South University.
+    </p>
+    <p>
+      My research so far is on <strong>deep research agents</strong>: agents that search across text and images
+      and write grounded long-form reports (<a href="#deep-reporter">Deep-Reporter</a>,
+      <a href="#doc-researcher">Doc-Researcher</a>), and ways to evaluate what these agents do along the way,
+      not just what they output (<a href="#miroeval">MiroEval</a>). I have also post-trained LLM agents with SFT
+      and RL, for parallel web search and for deciding when to step into a conversation, and worked on physically
+      consistent video generation and test-time training for robot manipulation. I have been fortunate to work with
+      <a href="https://www.comp.nus.edu.sg/cs/people/yansc">Prof. Shuicheng Yan</a>, Dr. Lidong Bing, and
+      Dr. Kuicai Dong.
+    </p>
+    <p>
+      I am broadly interested in how agents learn to reason and act:
+      <strong>reinforcement learning for LLM agents</strong>, <strong>test-time verification</strong>,
+      <strong>self-improving agents</strong>, and <strong>latent reasoning</strong>.
+    </p>
+  </section>
+
+  <section id="news">
+    <h2>News</h2>
+    <ul class="news">
+      <li><time>Sep 2026</time><span><a href="#miroeval">MiroEval</a> and <a href="#seeing-the-unseen">Seeing the Unseen</a> were accepted to NeurIPS 2026.</span></li>
+      <li><time>Jun 2026</time><span>Joined TikTok as an AI Engineer.</span></li>
+      <li><time>Jun 2026</time><span>Graduated from NUS with the Academic Excellence Award.</span></li>
+      <li><time>Apr 2026</time><span><a href="#deep-reporter">Deep-Reporter</a> was accepted to the ACL 2026 main conference.</span></li>
+      <li><time>Jan 2026</time><span><a href="#doc-researcher">Doc-Researcher</a> was accepted to WWW 2026.</span></li>
+    </ul>
+  </section>
+
+  <section id="publications">
+    <h2>Publications</h2>
+    <p class="note">* equal contribution. Highlighted: first or co-first author.</p>
+
+    <h3>Conference papers</h3>
+    <ul class="pubs">
+      <li class="pub lead" id="miroeval">
+        <div class="title"><a href="https://arxiv.org/abs/2603.28407">MiroEval: Benchmarking Multimodal Deep Research Agents in Process and Outcome</a></div>
+        <div class="authors"><b>Fangda Ye</b>, Yuxin Hu, Pengxiang Zhu, Yibo Li, Ziqi Jin, &hellip;, Bryan Hooi, Bo An, Shuicheng Yan, Lidong Bing</div>
+        <div class="tldr">A benchmark of 100 real-world tasks (70 text, 30 multimodal) that scores deep research agents on synthesis quality, factual verification, and the research process itself. Process quality turns out to predict the final outcome.</div>
+        <div class="meta"><span class="venue top">NeurIPS 2026</span><a href="https://arxiv.org/abs/2603.28407">arXiv</a><a href="https://github.com/MiroMindAI/MiroEval">Code</a></div>
+      </li>
+
+      <li class="pub lead" id="deep-reporter">
+        <div class="title"><a href="https://aclanthology.org/2026.acl-long.1909/">Deep-Reporter: Deep Research for Grounded Multimodal Long-Form Generation</a></div>
+        <div class="authors"><b>Fangda Ye</b>, Kuicai Dong, Zhifei Xie, Yuxin Hu, Yihang Yin, Shurui Huang, Shikai Dong, Chen Zhang, Jianzhu Bao, Shuicheng Yan</div>
+        <div class="tldr">An agent that writes long reports with images, grounded in what it retrieves: multimodal search and filtering, checklist-guided synthesis, and recurrent context management. Comes with M2LongBench, 247 research tasks across 9 domains.</div>
+        <div class="meta"><span class="venue top">ACL 2026 Main</span><a href="https://aclanthology.org/2026.acl-long.1909/">Paper</a><a href="https://arxiv.org/abs/2604.10741">arXiv</a><a href="https://github.com/fangda-ye/Deep-Report">Code</a><a href="https://huggingface.co/datasets/Fangda-Ye/Deep-Reporter-Data">Data</a></div>
+      </li>
+
+      <li class="pub" id="seeing-the-unseen">
+        <div class="title">Seeing the Unseen: Unified Visible&ndash;Invisible Motion for Physically Consistent Video Generation</div>
+        <div class="authors">Mingyang Bao, <b>Fangda Ye</b>, Xihao Chen, Bobo Li, Xiangtai Li, Shengqiong Wu</div>
+        <div class="tldr">Video generation that models visible and invisible motion together, so that generated videos stay physically consistent.</div>
+        <div class="meta"><span class="venue top">NeurIPS 2026</span></div>
+      </li>
+
+      <li class="pub lead" id="doc-researcher">
+        <div class="title"><a href="https://arxiv.org/abs/2510.21603">Doc-Researcher: A Unified System for Multimodal Document Parsing and Deep Research</a></div>
+        <div class="authors">Kuicai Dong*, Shurui Huang*, <b>Fangda Ye</b>*, Wei Han, Zhi Zhang, Dexun Li, Wenjun Li, Qu Yang, Gang Wang, Yichao Wang, Chen Zhang, Yong Liu</div>
+        <div class="tldr">Deep research over long multimodal documents through document parsing, adaptive retrieval, and an iterative multi-agent workflow. On the new M4DocBench it reaches 50.6% accuracy, 3.4&times; the strongest baseline.</div>
+        <div class="meta"><span class="venue top">WWW 2026</span><a href="https://arxiv.org/abs/2510.21603">arXiv</a></div>
+      </li>
+    </ul>
+
+    <h3>Under review</h3>
+    <ul class="pubs">
+      <li class="pub lead" id="tc-ttt">
+        <div class="title">Temporal Contrastive Test-Time Training for Robotic Manipulation</div>
+        <div class="authors">Yihang Yin*, <b>Fangda Ye</b>*, Shiguang Wu, Kunhao Pan, Ruiyang Xu, Ruyi Gan, Hao Wang</div>
+        <div class="tldr">A contrastive inner objective for test-time training that lets a robot policy's memory compare the present with its own history. Raises mean success on nine RMBench tasks from 31.8% to 51.8% over reconstruction-based TTT.</div>
+        <div class="meta"><span class="venue">Under review</span></div>
+      </li>
+    </ul>
+
+    <h3>Technical reports</h3>
+    <ul class="pubs">
+      <li class="pub" id="mirothinker">
+        <div class="title"><a href="https://arxiv.org/abs/2603.15726">MiroThinker-1.7 &amp; H1: Towards Heavy-Duty Research Agents via Verification</a></div>
+        <div class="authors">MiroMind Team (contributor; <b>Fangda Ye</b> among 41 authors)</div>
+        <div class="meta"><span class="venue">Tech report 2026</span><a href="https://arxiv.org/abs/2603.15726">arXiv</a></div>
+      </li>
+      <li class="pub" id="pask">
+        <div class="title"><a href="https://arxiv.org/abs/2604.08000">PASK: Toward Intent-Aware Proactive Agents with Long-Term Memory</a></div>
+        <div class="authors">Zhifei Xie, Zongzheng Hu, <b>Fangda Ye</b>, Xin Zhang, Haobo Chai, &hellip;, Deheng Ye, Chunyan Miao, Shuicheng Yan</div>
+        <div class="meta"><span class="venue">Tech report 2026</span><a href="https://arxiv.org/abs/2604.08000">arXiv</a></div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="experience">
+    <h2>Experience</h2>
+    <div class="entry">
+      <div class="entry-head"><span class="org">TikTok, Singapore</span><span class="when">Jun 2026 &ndash; present</span></div>
+      <div class="sub">AI Engineer, e-commerce recommendation</div>
+      <div class="desc">Ranking models for e-commerce short videos in TikTok's main feed. Upgraded training to user-level training (more than 2&times; faster). Now scaling up the ranking model with Transformer-based feature fusion, and building agents that automate the modeling loop, from adding features to running experiments and attributing results.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-head"><span class="org">MiroMind (now Apodex), Singapore</span><span class="when">Dec 2025 &ndash; Jun 2026</span></div>
+      <div class="sub">AI Scientist Intern &middot; Lead: Lidong Bing &middot; Mentors: Yue Deng, Lei Wang, Bin Wang</div>
+      <div class="desc">Led <a href="#miroeval">MiroEval</a>, which also served as the internal evaluation for <a href="#mirothinker">MiroThinker-1.7 &amp; H1</a>. Post-trained Qwen3.5-35B-A3B for parallel wide search (+35% relative on WideSearch-Bench), and designed memory, context, and retry handling in the MiroFlow v1.7 agent framework.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-head"><span class="org">Learning and Vision Lab, NUS</span><span class="when">Aug 2025 &ndash; May 2026</span></div>
+      <div class="sub">Graduate Researcher, with Prof. Shuicheng Yan</div>
+      <div class="desc">Master's thesis within <a href="#pask">PASK</a> on proactive demand detection: when should an assistant step into a conversation unasked? Built the LatentNeeds-Bench benchmark and InnerMind, a detector trained with SFT and GRPO that reaches 84.2% balanced accuracy.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-head"><span class="org">Huawei Singapore Research Center (Noah's Ark Lab)</span><span class="when">May 2025 &ndash; Dec 2025</span></div>
+      <div class="sub">AI Researcher Intern, with Dr. Kuicai Dong</div>
+      <div class="desc">Built <a href="#deep-reporter">Deep-Reporter</a> end to end, including the M2LongBench benchmark and 8K agentic traces for SFT. Designed the agent workflow of <a href="#doc-researcher">Doc-Researcher</a>. Outstanding Intern award.</div>
+    </div>
+  </section>
+
+  <section id="education">
+    <h2>Education</h2>
+    <div class="entry">
+      <div class="entry-head"><span class="org">National University of Singapore</span><span class="when">Aug 2024 &ndash; Jun 2026</span></div>
+      <div class="sub">Master of Computing (Computer Science) &middot; GPA 4.88 / 5.00</div>
+      <div class="desc">Academic Excellence Award (AY2025/26); Dean's List, both semesters of AY2024/25.<br>
+        Thesis: <em>Proactive Demand Detection in Multi-Turn Conversations: Benchmark, Method, and Evaluation</em>.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-head"><span class="org">Central South University</span><span class="when">Sep 2019 &ndash; Jun 2023</span></div>
+      <div class="sub">Bachelor of Engineering &middot; GPA 90.78 / 100</div>
+      <div class="desc">Outstanding Graduate; Outstanding Undergraduate Thesis.</div>
+    </div>
+  </section>
+
+  <section id="service">
+    <h2>Service</h2>
+    <ul class="plain">
+      <li><span>Reviewer, Workshop on Long-Context Foundation Models (LCFM), NeurIPS 2026</span><span class="when">2026</span></li>
+      <li><span>Reviewer, <em>ENGINEERING Information Technology &amp; Electronic Engineering</em></span><span class="when">2026</span></li>
+    </ul>
+  </section>
+
+  <footer>Last updated October 2026.</footer>
+</main>
+</body>
+</html>
